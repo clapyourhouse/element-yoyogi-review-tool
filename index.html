@@ -151,7 +151,7 @@
 
   <div class="card">
     <label>① 体験前に気になっていたこと・きっかけは？</label>
-    <div class="hint">例：猫背が気になっていた／運動不足を解消したかった／産後の体型が気になっていた</div>
+    <div class="hint">例：猫背が気になっていた／運動不足を感じていた／産後の体型が気になっていた</div>
     <textarea id="q1" placeholder="ここに入力"></textarea>
   </div>
 
@@ -249,6 +249,17 @@ function maybeExclaim(s) {
   return s;
 }
 
+// 「〜したかった」「〜したいと思っていた」のような、続きを欲しがる語尾で
+// 終わっている場合は、そのまま単独の文にすると言葉が途切れて聞こえるため、
+// 軽く文を閉じる一言を添える。
+function closeKikkake(q1) {
+  const trimmed = q1.replace(/[。！？!?.]+$/, "");
+  if (/(たかった|たいと思っていた|たいと感じていた)$/.test(trimmed)) {
+    return `${trimmed}というのがきっかけです。`;
+  }
+  return ensureDot(q1);
+}
+
 function generateReview() {
   const q1raw = document.getElementById('q1').value.trim();
   const q2raw = document.getElementById('q2').value.trim();
@@ -258,7 +269,7 @@ function generateReview() {
   const parts = [];
   parts.push(pick(openers));
 
-  if (q1raw) parts.push(ensureDot(q1raw));
+  if (q1raw) parts.push(closeKikkake(q1raw));
   if (q2raw) parts.push(maybeExclaim(pick(surprisePrefixes) + q2raw));
   if (chosen.length) parts.push(maybeExclaim(joinChips(chosen) + pick(chipSuffixes).replace(/。$/, "")));
 
