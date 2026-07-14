@@ -226,29 +226,27 @@ function ensureDot(s) {
   return s;
 }
 
-// 方針：ユーザーの回答は文の途中に接続せず、必ず独立した一文として扱う。
-// 前後には別の文（プレフィックス／フォローアップ）を添えるだけにすることで、
-// 回答がどんな文型（名詞・願望文・状態文など）でも文法的に壊れない。
-const kikkakePrefixes = [
-  "", "実は、", "もともと、"
-];
-const kikkakeFollowups = [
-  "このことがずっと気になっていて、思い切って体験することにしました。",
-  "そこで、体験レッスンを受けてみることにしました。",
-  "これがきっかけで、今回体験に申し込みました。"
-];
+// 方針：実際の口コミ（改行なしの連続した1〜2文、たまに「！」）に近づける。
+// ユーザーの回答は文の途中に接続せず独立した一文として扱い、余計な説明の埋め草は入れない。
+// 行ごとに改行せず、1つの段落として結合する。
 const surprisePrefixes = [
-  "実際に受けてみると、", "受けてみて感じたのは、", "体験してみると、"
+  "", "実際に受けてみると、", "体験してみると、"
 ];
 const chipSuffixes = [
-  "という点も良かったです。",
-  "も魅力に感じました。",
-  "も嬉しいポイントでした。"
+  "も良かったです。",
+  "も魅力でした。",
+  "も嬉しかったです。"
 ];
 
 function joinChips(chosen) {
   if (chosen.length === 1) return chosen[0];
   return chosen.slice(0, -1).join("、") + "や" + chosen[chosen.length - 1];
+}
+
+function maybeExclaim(s) {
+  s = ensureDot(s);
+  if (Math.random() < 0.45) s = s.replace(/。$/, "！");
+  return s;
 }
 
 function generateReview() {
@@ -257,23 +255,20 @@ function generateReview() {
   const q4raw = document.getElementById('q4').value.trim();
   const chosen = Array.from(selected);
 
-  const lines = [];
-  lines.push(pick(openers));
+  const parts = [];
+  parts.push(pick(openers));
 
-  if (q1raw) {
-    lines.push(pick(kikkakePrefixes) + ensureDot(q1raw));
-    lines.push(pick(kikkakeFollowups));
-  }
-  if (q2raw) {
-    lines.push(pick(surprisePrefixes) + ensureDot(q2raw));
-  }
-  if (chosen.length) lines.push(joinChips(chosen) + pick(chipSuffixes));
+  if (q1raw) parts.push(ensureDot(q1raw));
+  if (q2raw) parts.push(maybeExclaim(pick(surprisePrefixes) + q2raw));
+  if (chosen.length) parts.push(maybeExclaim(joinChips(chosen) + pick(chipSuffixes).replace(/。$/, "")));
 
   if (q4raw) {
-    lines.push(ensureDot(q4raw));
+    parts.push(maybeExclaim(q4raw));
   } else {
-    lines.push(pick(closers));
+    parts.push(maybeExclaim(pick(closers)));
   }
+
+  const lines = [parts.join("")];
 
   document.getElementById('result-text').value = lines.join("\n");
   document.getElementById('result-card').style.display = 'block';
