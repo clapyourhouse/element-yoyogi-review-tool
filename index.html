@@ -253,7 +253,13 @@ function maybeExclaim(s) {
 // 終わっている場合は、そのまま単独の文にすると言葉が途切れて聞こえるため、
 // 軽く文を閉じる一言を添える。
 function closeKikkake(q1) {
-  const trimmed = q1.replace(/[。！？!?.]+$/, "");
+  let trimmed = q1.trim().replace(/[。！？!?.]+$/, "");
+  // 理由を導く接続語で終わっている場合は、その接続語を取り除いてから閉じる
+  if (/(ため|から|ので)$/.test(trimmed)) {
+    trimmed = trimmed.replace(/(ため|から|ので)$/, "");
+    return `${trimmed}というのがきっかけです。`;
+  }
+  // 続きを欲しがる願望表現で終わっている場合は、そのまま閉じる
   if (/(たかった|たいと思っていた|たいと感じていた)$/.test(trimmed)) {
     return `${trimmed}というのがきっかけです。`;
   }
