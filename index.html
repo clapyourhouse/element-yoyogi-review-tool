@@ -243,6 +243,17 @@ function joinChips(chosen) {
   return chosen.slice(0, -1).join("、") + "や" + chosen[chosen.length - 1];
 }
 
+// 選ばれたタグが多いと1文に詰め込んで羅列になってしまうため、
+// 2個ずつのグループに分けて、それぞれ独立した文にする。
+function chipSentences(chosen) {
+  const out = [];
+  for (let i = 0; i < chosen.length; i += 2) {
+    const group = chosen.slice(i, i + 2);
+    out.push(maybeExclaim(joinChips(group) + pick(chipSuffixes).replace(/。$/, "")));
+  }
+  return out.join("");
+}
+
 function maybeExclaim(s) {
   s = ensureDot(s);
   if (Math.random() < 0.45) s = s.replace(/。$/, "！");
@@ -277,7 +288,7 @@ function generateReview() {
 
   if (q1raw) parts.push(closeKikkake(q1raw));
   if (q2raw) parts.push(maybeExclaim(pick(surprisePrefixes) + q2raw));
-  if (chosen.length) parts.push(maybeExclaim(joinChips(chosen) + pick(chipSuffixes).replace(/。$/, "")));
+  if (chosen.length) parts.push(chipSentences(chosen));
 
   if (q4raw) {
     parts.push(maybeExclaim(q4raw));
