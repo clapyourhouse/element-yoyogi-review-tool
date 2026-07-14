@@ -191,7 +191,7 @@
 <div class="toast" id="toast">コピーしました</div>
 
 <script>
-const points = ["トレーナーが丁寧", "スタジオが清潔", "駅から近い", "30分で完結", "完全個室", "マシンのサポートが安心", "本格的なマシンピラティス", "着替え・タオル無料"];
+const points = ["丁寧な指導", "清潔なスタジオ", "駅からのアクセスの良さ", "30分で完結する手軽さ", "完全個室のプライベート感", "安心感のあるマシンサポート", "本格的なマシンピラティス", "着替え・タオルの無料貸出"];
 const chipsEl = document.getElementById('chips');
 const selected = new Set();
 points.forEach(p => {
@@ -226,15 +226,19 @@ function ensureDot(s) {
   return s;
 }
 
-const kikkakeTemplates = [
-  (q1) => `${q1}というのがきっかけでした。`,
-  (q1) => `${q1}ことがずっと気になっていて、思い切って体験することにしました。`,
-  (q1) => `${q1}という悩みがあり、体験レッスンを受けてみることにしました。`
+// 方針：ユーザーの回答は文の途中に接続せず、必ず独立した一文として扱う。
+// 前後には別の文（プレフィックス／フォローアップ）を添えるだけにすることで、
+// 回答がどんな文型（名詞・願望文・状態文など）でも文法的に壊れない。
+const kikkakePrefixes = [
+  "", "実は、", "もともと、"
 ];
-const surpriseTemplates = [
-  (q2) => `実際に受けてみると、${q2}と感じました。`,
-  (q2) => `${q2}のが印象的でした。`,
-  (q2) => `想像していたより${q2}という感じで、良い意味で驚きました。`
+const kikkakeFollowups = [
+  "このことがずっと気になっていて、思い切って体験することにしました。",
+  "そこで、体験レッスンを受けてみることにしました。",
+  "これがきっかけで、今回体験に申し込みました。"
+];
+const surprisePrefixes = [
+  "実際に受けてみると、", "受けてみて感じたのは、", "体験してみると、"
 ];
 const chipSuffixes = [
   "という点も良かったです。",
@@ -256,8 +260,13 @@ function generateReview() {
   const lines = [];
   lines.push(pick(openers));
 
-  if (q1raw) lines.push(pick(kikkakeTemplates)(q1raw.replace(/[。！？!?.]+$/, "")));
-  if (q2raw) lines.push(pick(surpriseTemplates)(ensureDot(q2raw).replace(/。$/, "")));
+  if (q1raw) {
+    lines.push(pick(kikkakePrefixes) + ensureDot(q1raw));
+    lines.push(pick(kikkakeFollowups));
+  }
+  if (q2raw) {
+    lines.push(pick(surprisePrefixes) + ensureDot(q2raw));
+  }
   if (chosen.length) lines.push(joinChips(chosen) + pick(chipSuffixes));
 
   if (q4raw) {
