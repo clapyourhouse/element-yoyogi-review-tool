@@ -1,318 +1,396 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ELEMENT代々木店 口コミ作成シート</title>
-<style>
-  * { box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
-    background: #f6f5f2;
-    margin: 0;
-    padding: 24px 16px 60px;
-    color: #2b2b2b;
-    line-height: 1.7;
-  }
-  .wrap { max-width: 560px; margin: 0 auto; }
-  h1 {
-    font-size: 20px;
-    margin: 0 0 4px;
-    color: #1c1c1c;
-  }
-  .sub {
-    font-size: 13px;
-    color: #767676;
-    margin-bottom: 24px;
-  }
-  .card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-  label {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-  .hint {
-    font-size: 12px;
-    color: #8a8a8a;
-    margin-bottom: 8px;
-  }
-  textarea, input[type=text] {
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 14px;
-    font-family: inherit;
-    resize: vertical;
-  }
-  textarea { min-height: 56px; }
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .chip {
-    border: 1px solid #d8c7a8;
-    background: #fbf6ea;
-    color: #6b5327;
-    border-radius: 20px;
-    padding: 6px 12px;
-    font-size: 12px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .chip.selected {
-    background: #e8a33d;
-    color: #fff;
-    border-color: #e8a33d;
-  }
-  button.generate {
-    width: 100%;
-    background: #e8a33d;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 14px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    margin-top: 8px;
-  }
-  button.generate:active { opacity: 0.85; }
-  #result-card { display: none; }
-  #result-text {
-    white-space: pre-wrap;
-    font-size: 14px;
-    background: #fafafa;
-    border: 1px dashed #ccc;
-    border-radius: 8px;
-    padding: 14px;
-    margin-bottom: 12px;
-  }
-  .btnrow { display: flex; gap: 10px; }
-  .btn-secondary {
-    flex: 1;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 14px;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    color: #333;
-    display: block;
-  }
-  .btn-copy {
-    flex: 1;
-    background: #2b2b2b;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  .note {
-    font-size: 12px;
-    color: #8a8a8a;
-    margin-top: 16px;
-    line-height: 1.6;
-  }
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: #2b2b2b;
-    color: #fff;
-    padding: 10px 18px;
-    border-radius: 20px;
-    font-size: 13px;
-    opacity: 0;
-    transition: all 0.25s;
-    pointer-events: none;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-</style>
-</head>
-<body>
-<div class="wrap">
-  <h1>ELEMENT代々木店 口コミ作成シート</h1>
-  <div class="sub">体験してみた感想を、いくつか答えるだけで口コミ文にまとめます。実際に感じたことをそのまま書いてください。</div>
-
-  <div class="card">
-    <label>① 体験前に気になっていたこと・きっかけは？</label>
-    <div class="hint">例：猫背が気になっていた／運動不足を感じていた／産後の体型が気になっていた</div>
-    <textarea id="q1" placeholder="ここに入力"></textarea>
-  </div>
-
-  <div class="card">
-    <label>② 実際にやってみて意外だった・印象的だったことは？</label>
-    <div class="hint">例：想像より丁寧に教えてもらえた／マシンのサポートで無理なくできた／30分でも意外と鍛えられた</div>
-    <textarea id="q2" placeholder="ここに入力"></textarea>
-  </div>
-
-  <div class="card">
-    <label>③ 特に良かったポイント（複数選択OK）</label>
-    <div class="chips" id="chips"></div>
-  </div>
-
-  <div class="card">
-    <label>④ これから迷っている人に一言</label>
-    <div class="hint">例：初めてでも安心して試せると思います／忙しい人にこそおすすめです</div>
-    <textarea id="q4" placeholder="ここに入力"></textarea>
-  </div>
-
-  <button class="generate" onclick="generateReview()">口コミ文を作る</button>
-
-  <div class="card" id="result-card">
-    <label>できあがった口コミ文（自由に編集してOKです）</label>
-    <textarea id="result-text" style="min-height: 140px;"></textarea>
-    <div class="btnrow">
-      <button class="btn-copy" onclick="copyResult()">コピーする</button>
-      <a class="btn-secondary" href="https://g.page/r/CbJfTDpSnQacEBM/review" target="_blank">口コミ投稿ページを開く</a>
-    </div>
-  </div>
-
-  <div class="note">
-    ※コピーしたら、上の「口コミ投稿ページを開く」から貼り付けてください。文章はそのままでも、自分の言葉に直してもらっても大丈夫です。
-  </div>
-</div>
-
-<div class="toast" id="toast">コピーしました</div>
-
-<script>
-const points = ["丁寧な指導", "清潔なスタジオ", "駅からのアクセスの良さ", "30分で完結する手軽さ", "大きな窓からの自然光で開放的", "姿勢を確認しやすい大きな鏡", "おしゃれな照明でスタジオの雰囲気が良い", "安心感のあるマシンサポート", "本格的なマシンピラティス", "着替え・タオルの無料貸出", "姿勢の変化を実感できたこと", "肩こりが楽になったこと", "腰まわりの張りが軽くなったこと", "猫背が改善してきたこと"];
-const chipsEl = document.getElementById('chips');
-const selected = new Set();
-points.forEach(p => {
-  const el = document.createElement('div');
-  el.className = 'chip';
-  el.textContent = p;
-  el.onclick = () => {
-    if (selected.has(p)) { selected.delete(p); el.classList.remove('selected'); }
-    else { selected.add(p); el.classList.add('selected'); }
-  };
-  chipsEl.appendChild(el);
-});
-
-const openers = [
-  "ELEMENT代々木店のマシンピラティス・パーソナルトレーニングを体験しました。",
-  "代々木でパーソナルジムを探していて、ELEMENTの体験レッスンを受けてきました。",
-  "ELEMENT代々木店で、パーソナルマシンピラティスの体験を受けました。",
-  "代々木・新宿エリアでスポーツジムを探していて、ELEMENTの体験に行ってきました。"
-];
-const closers = [
-  "また利用したいと思います。",
-  "代々木でパーソナルジムやピラティススタジオを探している方にはおすすめです。",
-  "通いやすくて続けられそうだと感じました。",
-  "気になっている方はぜひ体験してみてほしいです。"
-];
-
-function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-function ensureDot(s) {
-  s = s.trim();
-  if (s && !/[。！？!?]$/.test(s)) s += "。";
-  return s;
-}
-
-// 方針：実際の口コミ（改行なしの連続した1〜2文、たまに「！」）に近づける。
-// ユーザーの回答は文の途中に接続せず独立した一文として扱い、余計な説明の埋め草は入れない。
-// 行ごとに改行せず、1つの段落として結合する。
-const surprisePrefixes = [
-  "", "実際に受けてみると、", "体験してみると、"
-];
-const chipSuffixes = [
-  "も良かったです。",
-  "も魅力でした。",
-  "も嬉しかったです。"
-];
-
-function joinChips(chosen) {
-  if (chosen.length === 1) return chosen[0];
-  return chosen.slice(0, -1).join("、") + "や" + chosen[chosen.length - 1];
-}
-
-// 選ばれたタグが多いと1文に詰め込んで羅列になってしまうため、
-// 2個ずつのグループに分けて、それぞれ独立した文にする。
-function chipSentences(chosen) {
-  const out = [];
-  for (let i = 0; i < chosen.length; i += 2) {
-    const group = chosen.slice(i, i + 2);
-    out.push(maybeExclaim(joinChips(group) + pick(chipSuffixes).replace(/。$/, "")));
-  }
-  return out.join("");
-}
-
-function maybeExclaim(s) {
-  s = ensureDot(s);
-  if (Math.random() < 0.45) s = s.replace(/。$/, "！");
-  return s;
-}
-
-// 「〜したかった」「〜したいと思っていた」のような、続きを欲しがる語尾で
-// 終わっている場合は、そのまま単独の文にすると言葉が途切れて聞こえるため、
-// 軽く文を閉じる一言を添える。
-function closeKikkake(q1) {
-  let trimmed = q1.trim().replace(/[。！？!?.]+$/, "");
-  // 理由を導く接続語で終わっている場合は、その接続語を取り除いてから閉じる
-  if (/(ため|から|ので)$/.test(trimmed)) {
-    trimmed = trimmed.replace(/(ため|から|ので)$/, "");
-    return `${trimmed}というのがきっかけです。`;
-  }
-  // 続きを欲しがる願望表現で終わっている場合は、そのまま閉じる
-  if (/(たかった|たいと思っていた|たいと感じていた)$/.test(trimmed)) {
-    return `${trimmed}というのがきっかけです。`;
-  }
-  return ensureDot(q1);
-}
-
-function generateReview() {
-  const q1raw = document.getElementById('q1').value.trim();
-  const q2raw = document.getElementById('q2').value.trim();
-  const q4raw = document.getElementById('q4').value.trim();
-  const chosen = Array.from(selected);
-
-  const parts = [];
-  parts.push(pick(openers));
-
-  if (q1raw) parts.push(closeKikkake(q1raw));
-  if (q2raw) parts.push(maybeExclaim(pick(surprisePrefixes) + q2raw));
-  if (chosen.length) parts.push(chipSentences(chosen));
-
-  if (q4raw) {
-    parts.push(maybeExclaim(q4raw));
-  } else {
-    parts.push(maybeExclaim(pick(closers)));
-  }
-
-  const lines = [parts.join("")];
-
-  document.getElementById('result-text').value = lines.join("\n");
-  document.getElementById('result-card').style.display = 'block';
-  document.getElementById('result-card').scrollIntoView({behavior: 'smooth'});
-}
-
-function copyResult() {
-  const ta = document.getElementById('result-text');
-  ta.select();
-  ta.setSelectionRange(0, 99999);
-  navigator.clipboard.writeText(ta.value).then(() => {
-    const toast = document.getElementById('toast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 1800);
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ELEMENT代々木店 口コミ作成シート</title>
+ <style>
+    * { box-sizing: border-box; }
+    body {
+         font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+         background: #f6f5f2;
+         margin: 0;
+         padding: 24px 16px 60px;
+         color: #2b2b2b;
+         line-height: 1.7;
+    }
+    .wrap { max-width: 560px; margin: 0 auto; }
+    h1 {
+         font-size: 20px;
+         margin: 0 0 4px;
+         color: #1c1c1c;
+    }
+    .sub {
+         font-size: 13px;
+         color: #767676;
+         margin-bottom: 24px;
+    }
+    .card {
+         background: #fff;
+         border-radius: 12px;
+         padding: 20px;
+         margin-bottom: 16px;
+         box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    label {
+         display: block;
+         font-size: 14px;
+         font-weight: 600;
+         margin-bottom: 6px;
+    }
+    .hint {
+         font-size: 12px;
+         color: #8a8a8a;
+         margin-bottom: 8px;
+    }
+    textarea, input[type=text] {
+         width: 100%;
+         border: 1px solid #ddd;
+         border-radius: 8px;
+         padding: 10px 12px;
+         font-size: 14px;
+         font-family: inherit;
+         resize: vertical;
+    }
+    textarea { min-height: 56px; }
+    .chips {
+         display: flex;
+         flex-wrap: wrap;
+         gap: 8px;
+         margin-top: 8px;
+    }
+    .chip {
+         border: 1px solid #d8c7a8;
+         background: #fbf6ea;
+         color: #6b5327;
+         border-radius: 20px;
+         padding: 6px 12px;
+         font-size: 12px;
+         cursor: pointer;
+         user-select: none;
+    }
+    .chip.selected {
+         background: #e8a33d;
+         color: #fff;
+         border-color: #e8a33d;
+    }
+    button.generate {
+         width: 100%;
+         background: #e8a33d;
+         color: #fff;
+         border: none;
+         border-radius: 10px;
+         padding: 14px;
+         font-size: 15px;
+         font-weight: 700;
+         cursor: pointer;
+         margin-top: 8px;
+    }
+    button.generate:active { opacity: 0.85; }
+    #result-card { display: none; }
+    #result-text {
+         white-space: pre-wrap;
+         font-size: 14px;
+         background: #fafafa;
+         border: 1px dashed #ccc;
+         border-radius: 8px;
+         padding: 14px;
+         margin-bottom: 12px;
+    }
+    .btnrow { display: flex; gap: 10px; }
+    .btn-secondary {
+         flex: 1;
+         background: #fff;
+         border: 1px solid #ccc;
+         border-radius: 8px;
+         padding: 12px;
+         font-size: 14px;
+         cursor: pointer;
+         text-align: center;
+         text-decoration: none;
+         color: #333;
+         display: block;
+    }
+    .btn-copy {
+         flex: 1;
+         background: #2b2b2b;
+         color: #fff;
+         border: none;
+         border-radius: 8px;
+         padding: 12px;
+         font-size: 14px;
+         cursor: pointer;
+    }
+    .note {
+         font-size: 12px;
+         color: #8a8a8a;
+         margin-top: 16px;
+         line-height: 1.6;
+    }
+    .toast {
+         position: fixed;
+         bottom: 24px;
+         left: 50%;
+         transform: translateX(-50%) translateY(20px);
+         background: #2b2b2b;
+         color: #fff;
+         padding: 10px 18px;
+         border-radius: 20px;
+         font-size: 13px;
+         opacity: 0;
+         transition: all 0.25s;
+         pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+ </head>
+ <body>
+  <div class="wrap">
+     <h1>ELEMENT代々木店 口コミ作成シート</h1>
+    <div class="sub">体験してみた感想を、いくつか答えるだけで口コミ文にまとめます。実際に感じたことをそのまま書いてください。</div>div>
+  
+    <div class="card">
+        <label>① 体験前に気になっていたこと・きっかけは？</label>
+        <div class="hint">例：猫背が気になっていた／運動不足を感じていた／産後の体型が気になっていた</div>div>
+        <textarea id="q1" placeholder="ここに入力"></textarea>
+    </div>div>
+  
+    <div class="card">
+        <label>② 実際にやってみて意外だった・印象的だったことは？</label>
+        <div class="hint">例：想像より丁寧に教えてもらえた／マシンのサポートで無理なくできた／30分でも意外と鍛えられた</div>div>
+        <textarea id="q2" placeholder="ここに入力"></textarea>
+    </div>div>
+  
+    <div class="card">
+        <label>③ 特に良かったポイント（複数選択OK）</label>
+        <div class="chips" id="chips"></div>div>
+    </div>div>
+  
+    <div class="card">
+        <label>④ これから迷っている人に一言</label>
+        <div class="hint">例：初めてでも安心して試せると思います／忙しい人にこそおすすめです</div>div>
+        <textarea id="q4" placeholder="ここに入力"></textarea>
+    </div>div>
+  
+    <button class="generate" id="generate-btn" onclick="generateReview()">口コミ文を作る</button>button>
+  
+    <div class="card" id="result-card">
+        <label>できあがった口コミ文（自由に編集してOKです）</label>
+        <div class="hint" id="polish-status" style="display:none;"></div>div>
+        <textarea id="result-text" style="min-height: 140px;"></textarea>
+        <div class="btnrow">
+              <button class="btn-copy" onclick="copyResult()">コピーする</button>button>
+              <a class="btn-secondary" href="https://g.page/r/CbJfTDpSnQacEBM/review" target="_blank">口コミ投稿ページを開く</a>a>
+        </div>div>
+        <div class="hint" style="margin-top:10px;">できあがった文章に、ご自身の言葉を少しだけ足したり、語尾を変えたりしていただくと、より自然な口コミになります。</div>div>
+    </div>div>
+  
+    <div class="note">
+        ※コピーしたら、上の「口コミ投稿ページを開く」から貼り付けてください。文章はそのままでも、自分の言葉に直してもらっても大丈夫です。
+    </div>div>
+  </div>div>
+ 
+ <div class="toast" id="toast">コピーしました</div>div>
+ 
+ <script>
+  const points = ["丁寧な指導", "清潔なスタジオ", "駅からのアクセスの良さ", "30分で完結する手軽さ", "大きな窓からの自然光で開放的", "姿勢を確認しやすい大きな鏡", "おしゃれな照明でスタジオの雰囲気が良い", "安心感のあるマシンサポート", "本格的なマシンピラティス", "着替え・タオルの無料貸出", "姿勢の変化を実感できたこと", "肩こりが楽になったこと", "腰まわりの張りが軽くなったこと", "猫背が改善してきたこと"];
+  const chipsEl = document.getElementById('chips');
+  const selected = new Set();
+  points.forEach(p => {
+     const el = document.createElement('div');
+     el.className = 'chip';
+     el.textContent = p;
+     el.onclick = () => {
+          if (selected.has(p)) { selected.delete(p); el.classList.remove('selected'); }
+          else { selected.add(p); el.classList.add('selected'); }
+     };
+     chipsEl.appendChild(el);
   });
-}
-</script>
-</body>
-</html>
+
+  const openers = [
+     "ELEMENT代々木店のマシンピラティス・パーソナルトレーニングを体験しました。",
+     "代々木でパーソナルジムを探していて、ELEMENTの体験レッスンを受けてきました。",
+     "ELEMENT代々木店で、パーソナルマシンピラティスの体験を受けました。",
+     "代々木・新宿エリアでスポーツジムを探していて、ELEMENTの体験に行ってきました。"
+   ];
+  const closers = [
+     "また利用したいと思います。",
+     "代々木でパーソナルジムやピラティススタジオを探している方にはおすすめです。",
+     "通いやすくて続けられそうだと感じました。",
+     "気になっている方はぜひ体験してみてほしいです。"
+   ];
+
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function ensureDot(s) {
+     s = s.trim();
+     if (s && !/[。！？!?]$/.test(s)) s += "。";
+     return s;
+  }
+
+  // 方針：実際の口コミ（改行なしの連続した1〜2文、たまに「！」）に近づける。
+  // ユーザーの回答は文の途中に接続せず独立した一文として扱い、余計な説明の埋め草は入れない。
+  // 行ごとに改行せず、1つの段落として結合する。
+  const surprisePrefixes = [
+     "", "実際に受けてみると、", "体験してみると、"
+   ];
+  const chipSuffixes = [
+     "も良かったです。",
+     "も魅力でした。",
+     "も嬉しかったです。"
+   ];
+
+  function joinChips(chosen) {
+     if (chosen.length === 1) return chosen[0];
+     return chosen.slice(0, -1).join("、") + "や" + chosen[chosen.length - 1];
+  }
+
+  // 選ばれたタグが多いと1文に詰め込んで羅列になってしまうため、
+  // 2個ずつのグループに分けて、それぞれ独立した文にする。
+  function chipSentences(chosen) {
+     const out = [];
+     for (let i = 0; i < chosen.length; i += 2) {
+          const group = chosen.slice(i, i + 2);
+          out.push(maybeExclaim(joinChips(group) + pick(chipSuffixes).replace(/。$/, "")));
+     }
+     return out.join("");
+  }
+
+  function maybeExclaim(s) {
+     s = ensureDot(s);
+     if (Math.random() < 0.45) s = s.replace(/。$/, "！");
+     return s;
+  }
+
+  // 「〜したかった」「〜したいと思っていた」のような、続きを欲しがる語尾で
+  // 終わっている場合は、そのまま単独の文にすると言葉が途切れて聞こえるため、
+  // 軽く文を閉じる一言を添える。
+  function closeKikkake(q1) {
+     let trimmed = q1.trim().replace(/[。！？!?.]+$/, "");
+     // 理由を導く接続語で終わっている場合は、その接続語を取り除いてから閉じる
+     if (/(ため|から|ので)$/.test(trimmed)) {
+          trimmed = trimmed.replace(/(ため|から|ので)$/, "");
+          return `${trimmed}というのがきっかけです。`;
+     }
+     // 続きを欲しがる願望表現で終わっている場合は、そのまま閉じる
+     if (/(たかった|たいと思っていた|たいと感じていた)$/.test(trimmed)) {
+          return `${trimmed}というのがきっかけです。`;
+     }
+     return ensureDot(q1);
+  }
+
+  // ここにCloudflare Workerのエンドポイント（デプロイ後に表示されるURL）を入れてください。
+  // 例）"https://element-review-polish.your-name.workers.dev"
+  const WORKER_URL = "https://hidden-sea-1948.clapyourhouse.workers.dev";
+
+  async function generateReview() {
+     const q1raw = document.getElementById('q1').value.trim();
+     const q2raw = document.getElementById('q2').value.trim();
+     const q4raw = document.getElementById('q4').value.trim();
+     const chosen = Array.from(selected);
+
+     const parts = [];
+     parts.push(pick(openers));
+
+     if (q1raw) parts.push(closeKikkake(q1raw));
+     if (q2raw) parts.push(maybeExclaim(pick(surprisePrefixes) + q2raw));
+     if (chosen.length) parts.push(chipSentences(chosen));
+
+     if (q4raw) {
+          parts.push(maybeExclaim(q4raw));
+     } else {
+          parts.push(maybeExclaim(pick(closers)));
+     }
+
+     const draft = parts.join("");
+
+     const resultText = document.getElementById('result-text');
+     const resultCard = document.getElementById('result-card');
+     const statusEl = document.getElementById('polish-status');
+     const genBtn = document.getElementById('generate-btn');
+
+    const workerConfigured = WORKER_URL && WORKER_URL.indexOf("REPLACE-ME") === -1;
+
+     resultCard.style.display = 'block';
+     resultCard.scrollIntoView({behavior: 'smooth'});
+
+     if (!workerConfigured) {
+          // Worker未設定の間は、その場でテンプレ文を表示する（待ち時間がないため）
+          resultText.value = draft;
+          return;
+     }
+
+     // 3個以上選んでいると機械的な羅列になりやすいので、AIで自然な文章に整える。
+     // 整え中の下書き(draft)を一瞬表示すると違和感があるため、結果が返るまでは
+     // ローディング表示のみにし、テキストエリアには古い文章を出さないようにする。
+     resultText.value = "";
+     resultText.placeholder = "AIが自然な文章を作成しています…";
+     genBtn.disabled = true;
+     genBtn.textContent = "作成しています…";
+     statusEl.style.display = 'block';
+     statusEl.textContent = "AIが自然な文章を作成しています…";
+
+     let fellBack = false;
+     try {
+          const polished = await polishWithAI(draft, { kikkake: q1raw, surprise: q2raw, points: chosen, closing: q4raw });
+          // 通信に失敗した場合やAIが空を返した場合は、下書き(draft)にフォールバックする
+          if (polished) {
+                 resultText.value = polished;
+          } else {
+                 resultText.value = draft;
+                 fellBack = true;
+          }
+     } catch (e) {
+          // 添削に失敗しても下書きはそのまま使えるので、フォールバックする
+          resultText.value = draft;
+          fellBack = true;
+     } finally {
+          resultText.placeholder = "";
+          genBtn.disabled = false;
+          genBtn.textContent = "口コミ文を作る";
+          if (fellBack) {
+                 // 失敗を隠さず、テンプレ文で代用したことが分かるようにしておく
+                 statusEl.style.display = 'block';
+                 statusEl.textContent = "（AIでの調整ができなかったため、下書きの文章を表示しています。自由に編集してください）";
+          } else {
+                 statusEl.textContent = "";
+                 statusEl.style.display = 'none';
+          }
+     }
+  }
+
+  async function polishWithAI(draft, raw) {
+     if (!WORKER_URL || WORKER_URL.indexOf("REPLACE-ME") !== -1) {
+          // Worker未設定の間はテンプレ文のみで動作する
+          return null;
+     }
+     // お客様の生の回答（raw）を渡して、AIに一から自然な口コミ文を書いてもらう。
+     // draftはWorker側が古い形式にしか対応していない場合のフォールバック用。
+     const res = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ raw, draft }),
+     });
+     if (!res.ok) throw new Error("polish failed");
+     const data = await res.json();
+     return (data.polished || "").trim();
+  }
+
+  function copyResult() {
+     const ta = document.getElementById('result-text');
+     ta.select();
+     ta.setSelectionRange(0, 99999);
+     navigator.clipboard.writeText(ta.value).then(() => {
+          const toast = document.getElementById('toast');
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 1800);
+     });
+  }
+ </script>
+ </body>
+</html>h
+
+ </script></label></label></h1>
+ </body>
+ </style></title>
+ </head>
