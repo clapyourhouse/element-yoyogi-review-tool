@@ -168,7 +168,7 @@
 
   <div class="card">
     <label>④ これから迷っている人に一言</label>
-    <div class="hint">例：初めでも安心して試せると思います／忙しい人にこそおすすめです</div>
+    <div class="hint">例：初めてでも安心して試せると思います／忙しい人にこそおすすめです</div>
     <textarea id="q4" placeholder="ここに入力"></textarea>
   </div>
 
@@ -270,11 +270,11 @@ function closeKikkake(q1) {
   // 理由を導く接続語で終わっている場合は、その接続語を取り除いてから閉じる
   if (/(ため|から|ので)$/.test(trimmed)) {
     trimmed = trimmed.replace(/(ため|から|ので)$/, "");
-    return `${trimmed}���いうのがきっかけです。`;
+    return `${trimmed}というのがきっかけです。`;
   }
   // 続きを欲しがる願望表現で終わっている場合は、そのまま閉じる
   if (/(たかった|たいと思っていた|たいと感じていた)$/.test(trimmed)) {
-    return `${trimmed}���いうのがきっかけです。`;
+    return `${trimmed}というのがきっかけです。`;
   }
   return ensureDot(q1);
 }
